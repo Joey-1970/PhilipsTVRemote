@@ -1,0 +1,14 @@
+{
+  "id": "{CC0B82B1-8EC9-7533-F074-30E16F6B4DFF}",
+  "name": "PhilipsTVRemote",
+  "type": 3,
+  "vendor": "JP-IPS-Modules",
+  "aliases":
+  [
+    "PhilipsTVRemote"
+  ],
+  "parentRequirements": [],
+  "childRequirements": [],
+  "implemented": [],
+  "prefix": "PhilipsTVRemote"
+}
