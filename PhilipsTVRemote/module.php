@@ -12,7 +12,7 @@ class PhilipsTVRemote extends IPSModule
 		
 		
 		// Profile anlegen
-		$this->RegisterProfileInteger("PhilipsTVRemote.Volume", "Music", "", " dB", 0 60, 1);
+		$this->RegisterProfileInteger("PhilipsTVRemote.Volume", "Music", "", " dB", 0, 60, 1);
 		
 		// Status Variablen anlegen
 		$this->RegisterVariableInteger("LastUpdate", "Letztes Update", "~UnixTimestamp", 10);
