@@ -167,6 +167,40 @@ class PhilipsTVRemote extends IPSModule
 		}
 	}
 
+	private function GetSourcesData()
+	{
+		If ($this->ReadPropertyBoolean("Open") == true) {
+			$IP = $this->ReadPropertyString("IPAddress");
+			$URL = 'http://'.$IP.':1925/6/sources';
+
+			$Result = $this->GetState($URL);
+			If ($Result === false) {
+				exit;
+			}
+			else {
+				$Data = json_decode($Result);
+				
+			}
+		}
+	}
+
+	private function GetCurrentSourcesData()
+	{
+		If ($this->ReadPropertyBoolean("Open") == true) {
+			$IP = $this->ReadPropertyString("IPAddress");
+			$URL = 'http://'.$IP.':1925/6/sources/current';
+
+			$Result = $this->GetState($URL);
+			If ($Result === false) {
+				exit;
+			}
+			else {
+				$Data = json_decode($Result);
+				
+			}
+		}
+	}
+
 	private function SetValueWhenChanged($Ident, $Value)
     	{
         	if ($this->GetValue($Ident) != $Value) {
