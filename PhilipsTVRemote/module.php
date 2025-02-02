@@ -135,7 +135,7 @@ class PhilipsTVRemote extends IPSModule
 			}
 			else {
 				$Data = json_decode($Result);
-				this->SetValueWhenChanged("Menulanguage", $Data->{'menulanguage'});
+				$this->SetValueWhenChanged("Menulanguage", $Data->{'menulanguage'});
 				$this->SetValueWhenChanged("Name", $Data->{'name'});
                     		$this->SetValueWhenChanged("Country", $Data->{'country'});
 			}
