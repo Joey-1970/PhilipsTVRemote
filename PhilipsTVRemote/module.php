@@ -59,7 +59,7 @@ class PhilipsTVRemote extends IPSModule
 			If ($this->GetStatus() <> 102) {
 				$this->SetStatus(102);
 			}
-			$this->GetSystemData;
+			$this->GetSystemData();
 			
 			
 		}
