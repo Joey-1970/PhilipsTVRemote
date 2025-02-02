@@ -17,7 +17,9 @@ class PhilipsTVRemote extends IPSModule
 		$this->RegisterVariableBoolean("State", "Status", "~Switch", 10);
 		$this->EnableAction("State");
 
-		$this->RegisterVariableString("Menulanguage", "Menü-Sprache", "~Textbox", 10);
+		$this->RegisterVariableString("Menulanguage", "Menü-Sprache", "", 10);
+		$this->RegisterVariableString("Name", "TV-Typ", "", 10);
+		$this->RegisterVariableString("Country", "Land", "", 10);
 		
 		
 		
@@ -57,7 +59,7 @@ class PhilipsTVRemote extends IPSModule
 			If ($this->GetStatus() <> 102) {
 				$this->SetStatus(102);
 			}
-			$this->ConnectionTest();
+			$this->GetSystemData;
 			
 			
 		}
@@ -112,42 +114,12 @@ class PhilipsTVRemote extends IPSModule
 
 			If ($Result === false) {
 				$this->SendDebug("GetState", "Fehler beim Daten-Update", 0);
-				return;
+				return($Result);
 			}
 			else {
-				$this->SendDebug("GetState", $Result, 0);
-                    		$Data = json_decode($Result);
-				$this->SetValueWhenChanged("xclk", $Data->{'xclk'});
-				$this->SetValueWhenChanged("framesize", $Data->{'framesize'});
-                    		$this->SetValueWhenChanged("quality", $Data->{'quality'});
-				$this->SetValueWhenChanged("brightness", $Data->{'brightness'});
-				$this->SetValueWhenChanged("contrast", $Data->{'contrast'});
-				$this->SetValueWhenChanged("saturation", $Data->{'saturation'});
-				$this->SetValueWhenChanged("special_effect", $Data->{'special_effect'});
-				$this->SetValueWhenChanged("awb", $Data->{'awb'});
-				$this->SetValueWhenChanged("awb_gain", $Data->{'awb_gain'});
-				$this->SetValueWhenChanged("wb_mode", $Data->{'wb_mode'});
-				$this->SetValueWhenChanged("aec", $Data->{'aec'});
-				$this->SetValueWhenChanged("aec2", $Data->{'aec2'});
-				$this->SetValueWhenChanged("aec_value", $Data->{'aec_value'});
-				$this->SetValueWhenChanged("ae_level", $Data->{'ae_level'});
-				$this->SetValueWhenChanged("agc", $Data->{'agc'});
-				$this->SetValueWhenChanged("agc_gain", $Data->{'agc_gain'});
-				$this->SetValueWhenChanged("gainceiling", $Data->{'gainceiling'});
-				$this->SetValueWhenChanged("bpc", $Data->{'bpc'});
-				$this->SetValueWhenChanged("wpc", $Data->{'wpc'});
-				$this->SetValueWhenChanged("raw_gma", $Data->{'raw_gma'});
-				$this->SetValueWhenChanged("lenc", $Data->{'lenc'});
-				$this->SetValueWhenChanged("hmirror", $Data->{'hmirror'});
-				If (isset($Data->{'vflip'})) { // Die Variable wird nicht immer mitgeliefert
-					$this->SetValueWhenChanged("vflip", $Data->{'vflip'});
-				}
-				$this->SetValueWhenChanged("dcw", $Data->{'dcw'});
-				$this->SetValueWhenChanged("colorbar", $Data->{'colorbar'});
-				$this->SetValueWhenChanged("led_intensity", $Data->{'led_intensity'});
-
 				$this->SetValueWhenChanged("LastUpdate", time() );
-			}	
+				return($Result);
+			}
 		}
 	}
 
@@ -170,22 +142,7 @@ class PhilipsTVRemote extends IPSModule
 		}
 	}
 	
-	public function SetState(String $Variable, int $Value)
-	{
-		If (($this->ReadPropertyBoolean("Open") == true) AND ($this->ConnectionTest() == true)) {
-			$IP = $this->ReadPropertyString("IPAddress");
-			$ch = curl_init();
-			curl_setopt($ch, CURLOPT_URL, 'http://'.$IP.'/control?var='.$Variable.'&val='.$Value);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-			$Result = curl_exec($ch);
-			curl_close($ch);
-			
-			If ($Result === false) {
-				$this->SendDebug("SetState", "Fehler beim Status-Update", 0);
-			}
-			$this->GetState();
-		}
-	} 
+	
 
 	private function SetValueWhenChanged($Ident, $Value)
     	{
