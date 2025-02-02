@@ -1,0 +1,12 @@
+{
+  "id": "{CBFCD684-3C76-8F1C-C848-5CA81E37F85B}",
+  "author": "Joachim Päper",
+  "name": "PhilipsTVRemote",
+  "url": "www.ip-symcon.de",
+  "compatibility": {
+        "version": "5.1"
+  },
+  "version": "1.0",
+  "build": 0,
+  "date": 0
+}
