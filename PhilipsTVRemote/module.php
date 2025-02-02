@@ -12,6 +12,9 @@ class PhilipsTVRemote extends IPSModule
 		
 		
 		// Profile anlegen
+		$this->RegisterProfileInteger("PhilipsTVRemote.Volume", "Music", "", " dB", 0 60, 1);
+		
+		// Status Variablen anlegen
 		$this->RegisterVariableInteger("LastUpdate", "Letztes Update", "~UnixTimestamp", 10);
 		
 		$this->RegisterVariableBoolean("State", "Status", "~Switch", 10);
@@ -20,9 +23,12 @@ class PhilipsTVRemote extends IPSModule
 		$this->RegisterVariableString("Menulanguage", "Menü-Sprache", "", 10);
 		$this->RegisterVariableString("Name", "TV-Typ", "", 10);
 		$this->RegisterVariableString("Country", "Land", "", 10);
+
+		$this->RegisterVariableInteger("Volume", "Volume", "PhilipsTVRemote.Volume", 10);
+		$this->EnableAction("Volume");
 		
-		
-		
+		$this->RegisterVariableBoolean("Mute", "Mute", "~Switch", 10);
+		$this->EnableAction("Mute");
 	}
 	
 	public function GetConfigurationForm() { 
@@ -60,6 +66,7 @@ class PhilipsTVRemote extends IPSModule
 				$this->SetStatus(102);
 			}
 			$this->GetSystemData();
+			$this->GetAudioData();
 			
 			
 		}
@@ -142,7 +149,23 @@ class PhilipsTVRemote extends IPSModule
 		}
 	}
 	
-	
+	private function GetAudioData()
+	{
+		If ($this->ReadPropertyBoolean("Open") == true) {
+			$IP = $this->ReadPropertyString("IPAddress");
+			$URL = 'http://'.$IP.':1925/6/audio/volume';
+
+			$Result = $this->GetState($URL);
+			If ($Result === false) {
+				exit;
+			}
+			else {
+				$Data = json_decode($Result);
+				$this->SetValueWhenChanged("Volume", $Data->{'current'});
+				$this->SetValueWhenChanged("Mute", $Data->{'muted'});
+			}
+		}
+	}
 
 	private function SetValueWhenChanged($Ident, $Value)
     	{
