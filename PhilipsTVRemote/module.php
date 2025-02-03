@@ -254,14 +254,13 @@ class PhilipsTVRemote extends IPSModule
 
 	public function PowerState()
 	{
-	      	$result = false;
 	      	If (Sys_Ping($this->ReadPropertyString("IPAddress"), 100)) {
 		      	$this->SetValueWhenChanged("State", true);
 		}
 		else {
 			$this->SetValueWhenChanged("State", false);
 		}
-	return $result;
+	return;
 	}
 	
 	private function ConnectionTest()
