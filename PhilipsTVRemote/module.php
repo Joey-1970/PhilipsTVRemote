@@ -108,7 +108,7 @@ class PhilipsTVRemote extends IPSModule
 					$this->SetState('http://'.$IP.':1925/6/audio/volume', 'muted', $Value);
 					$this->GetAudioData();
 					break;
-				case "Mute":
+				case "Volume":
 					$this->SetState('http://'.$IP.':1925/6/audio/volume', 'current', $Value);
 					$this->GetAudioData();
 					break;
