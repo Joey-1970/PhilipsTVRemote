@@ -60,11 +60,12 @@ class PhilipsTVRemote extends IPSModule
 		parent::ApplyChanges();
 		
 		
-		If (($this->ReadPropertyBoolean("Open") == true) AND ($this->ConnectionTest() == true)) {
+		If ($this->ReadPropertyBoolean("Open") == true) {
 			
 			If ($this->GetStatus() <> 102) {
 				$this->SetStatus(102);
 			}
+			
 			$this->GetSystemData();
 			$this->GetAudioData();
 			$this->SetTimerInterval("PowerState", 3 * 1000);
