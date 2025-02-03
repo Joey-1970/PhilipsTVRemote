@@ -12,7 +12,7 @@ class PhilipsTVRemote extends IPSModule
 		
 		
 		// Profile anlegen
-		$this->RegisterProfileInteger("PhilipsTVRemote.Volume", "Music", "", " dB", 0, 60, 1);
+		$this->RegisterProfileInteger("PhilipsTVRemote.Volume", "Music", "", "", 0, 60, 1);
 		
 		// Status Variablen anlegen
 		$this->RegisterVariableInteger("LastUpdate", "Letztes Update", "~UnixTimestamp", 10);
@@ -110,6 +110,39 @@ class PhilipsTVRemote extends IPSModule
 		}
 	}
 
+	public function SetState(String $URL, Strong $Key, String $Value)
+	{
+		If (($this->ReadPropertyBoolean("Open") == true) AND ($this->ConnectionTest() == true)) {
+			$data = array($Key => $Value);
+			// encoding the request data as JSON which will be sent in POST
+			$encodedData = json_encode($data);
+			// initiate curl with the url to send request
+			$curl = curl_init($URL);
+			// return CURL response
+			curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+			// Send request data using POST method
+			curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
+			// Data conent-type is sent as JSON
+			curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+			curl_setopt($curl, CURLOPT_POST, true);
+			// Curl POST the JSON data to send the request
+			curl_setopt($curl, CURLOPT_POSTFIELDS, $encodedData);
+			// execute the curl POST request and send data
+			$Result = curl_exec($curl);
+			curl_close($curl);
+
+			If ($Result === false) {
+				$this->SendDebug("GetState", "Fehler beim Daten-Update", 0);
+				return($Result);
+			}
+			else {
+				$this->SetValueWhenChanged("LastUpdate", time() );
+				return($Result);
+			}
+		}
+	}
+
+	
 	public function GetState(String $URL)
 	{
 		If (($this->ReadPropertyBoolean("Open") == true) AND ($this->ConnectionTest() == true)) {
@@ -130,6 +163,8 @@ class PhilipsTVRemote extends IPSModule
 		}
 	}
 
+
+	
 	private function GetSystemData()
 	{
 		If ($this->ReadPropertyBoolean("Open") == true) {
