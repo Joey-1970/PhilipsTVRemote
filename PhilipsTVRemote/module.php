@@ -159,6 +159,7 @@ class PhilipsTVRemote extends IPSModule
 			$Result = curl_exec($ch);
 			curl_close($ch);
 
+			
 			If ($Result === false) {
 				$this->SendDebug("GetState", "Fehler beim Daten-Update", 0);
 				return($Result);
