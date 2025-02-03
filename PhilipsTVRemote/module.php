@@ -83,6 +83,7 @@ class PhilipsTVRemote extends IPSModule
 	public function RequestAction($Ident, $Value) 
 	{
   		If ($this->ReadPropertyBoolean("Open") == true) {
+			$IP = $this->ReadPropertyString("IPAddress");
 			switch($Ident) {
 				case "State":
 					$this->SetValue($Ident, $Value);
@@ -103,7 +104,11 @@ class PhilipsTVRemote extends IPSModule
 					}
 					
 					break;	
-				
+				case "Mute":
+					//$this->SetValue($Ident, $Value);
+					$this->SetState('http://'.$IP.':1925/6/audio/volume', 'muted', $Value);
+					$this->SGetAudioData();
+					break;
 				default:
 				    throw new Exception("Invalid Ident");
 			}
