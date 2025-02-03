@@ -87,6 +87,7 @@ class PhilipsTVRemote extends IPSModule
 			$IP = $this->ReadPropertyString("IPAddress");
 			switch($Ident) {
 				case "State":
+					$this->SetValue($Ident, $Value);
 					If ($Value == true) {
 						// On
 						$MAC = $this->ReadPropertyString("MAC");
