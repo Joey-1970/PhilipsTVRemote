@@ -9,7 +9,7 @@ class PhilipsTVRemote extends IPSModule
 		$this->RegisterPropertyBoolean("Open", false);
 	    	$this->RegisterPropertyString("IPAddress", "127.0.0.1");
 		$this->RegisterPropertyString("MAC", "00:00:00:00:00:00");
-		
+		$this->RegisterTimer("PowerState", 0, 'PhilipsTVRemote_PowerState($_IPS["TARGET"]);');
 		
 		// Profile anlegen
 		$this->RegisterProfileInteger("PhilipsTVRemote.Volume", "Music", "", "", 0, 60, 1);
@@ -67,14 +67,14 @@ class PhilipsTVRemote extends IPSModule
 			}
 			$this->GetSystemData();
 			$this->GetAudioData();
-			
+			$this->SetTimerInterval("PowerState", 30 * 1000);
 			
 		}
 		else {
 			If ($this->GetStatus() <> 104) {
 				$this->SetStatus(104);
 			}
-			
+			$this->SetTimerInterval("PowerState", 0);
 		}	   
 	}
 	
@@ -251,6 +251,18 @@ class PhilipsTVRemote extends IPSModule
             		$this->SetValue($Ident, $Value);
         	}
     	}    
+
+	public function PowerState()
+	{
+	      	$result = false;
+	      	If (Sys_Ping($this->ReadPropertyString("IPAddress"), 100)) {
+		      	$this->SetValueWhenChanged("State", true);
+		}
+		else {
+			$this->SetValueWhenChanged("State", false);
+		}
+	return $result;
+	}
 	
 	private function ConnectionTest()
 	{
@@ -263,7 +275,6 @@ class PhilipsTVRemote extends IPSModule
 		      	$this->SetValueWhenChanged("State", true);
 		}
 		else {
-			IPS_LogMessage("PhilipsTVRemote","IP ".$this->ReadPropertyString("IPAddress")." reagiert nicht!");
 			$this->SendDebug("ConnectionTest", "IP ".$this->ReadPropertyString("IPAddress")." reagiert nicht!", 0);
 			$this->SetValueWhenChanged("State", false);
 			
