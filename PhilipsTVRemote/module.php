@@ -165,6 +165,10 @@ class PhilipsTVRemote extends IPSModule
 				$this->SendDebug("GetState", "Fehler beim Daten-Update", 0);
 				return($Result);
 			}
+			elseif (is_null($Result) == true) {
+				$Result = false;
+				return($Result);
+			}
 			else {
 				$this->SetValueWhenChanged("LastUpdate", time() );
 				return($Result);
