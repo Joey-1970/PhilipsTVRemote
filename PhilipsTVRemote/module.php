@@ -107,7 +107,7 @@ class PhilipsTVRemote extends IPSModule
 				case "Mute":
 					//$this->SetValue($Ident, $Value);
 					$this->SetState('http://'.$IP.':1925/6/audio/volume', 'muted', $Value);
-					$this->SGetAudioData();
+					$this->GetAudioData();
 					break;
 				default:
 				    throw new Exception("Invalid Ident");
