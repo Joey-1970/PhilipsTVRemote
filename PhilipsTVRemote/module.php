@@ -1,4 +1,4 @@
-tr<?
+<?
 class PhilipsTVRemote extends IPSModule
 {
 	// Überschreibt die interne IPS_Create($id) Funktion
