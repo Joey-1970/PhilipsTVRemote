@@ -205,7 +205,8 @@ class PhilipsTVRemote extends IPSModule
 			else {
 				$Data = json_decode($Result);
 				$this->SetValueWhenChanged("Volume", $Data->{'current'});
-				$this->SetValueWhenChanged("Mute", bolval($Data->{'muted'}));
+				//$this->SendDebug("GetAudioData", "Fehler beim Daten-Update", 0);
+				$this->SetValueWhenChanged("Mute", boolval($Data->{'muted'}));
 			}
 		}
 	}
