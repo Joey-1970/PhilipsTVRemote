@@ -115,7 +115,7 @@ class PhilipsTVRemote extends IPSModule
 		}
 	}
 
-	public function SetState(String $URL, Strong $Key, String $Value)
+	public function SetState(String $URL, String $Key, String $Value)
 	{
 		If (($this->ReadPropertyBoolean("Open") == true) AND ($this->ConnectionTest() == true)) {
 			$data = array($Key => $Value);
