@@ -60,7 +60,7 @@ class PhilipsTVRemote extends IPSModule
 		parent::ApplyChanges();
 		
 		
-		If ($this->ReadPropertyBoolean("Open") == true) {
+		If (($this->ReadPropertyBoolean("Open") == true) AND ($this->ConnectionTest() == true)) {
 			
 			If ($this->GetStatus() <> 102) {
 				$this->SetStatus(102);
@@ -119,7 +119,7 @@ class PhilipsTVRemote extends IPSModule
 
 	public function SetState(String $URL, String $Key, String $Value)
 	{
-		If (($this->ReadPropertyBoolean("Open") == true) AND ($this->ConnectionTest() == true)) {
+		If (($this->ReadPropertyBoolean("Open") == true) AND ($this->PowerState() == true)) {
 			$data = array($Key => $Value);
 			// encoding the request data as JSON which will be sent in POST
 			$encodedData = json_encode($data);
@@ -152,7 +152,7 @@ class PhilipsTVRemote extends IPSModule
 	
 	public function GetState(String $URL)
 	{
-		If (($this->ReadPropertyBoolean("Open") == true) AND ($this->ConnectionTest() == true)) {
+		If (($this->ReadPropertyBoolean("Open") == true) AND ($this->PowerState() == true)) {
 			$ch = curl_init();
 			curl_setopt($ch, CURLOPT_URL, $URL);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -254,16 +254,17 @@ class PhilipsTVRemote extends IPSModule
 	{
 	      	If (Sys_Ping($this->ReadPropertyString("IPAddress"), 100)) {
 		      	$this->SetValueWhenChanged("State", true);
+			$result = true;
 		}
 		else {
 			$this->SetValueWhenChanged("State", false);
+			$result = false;
 		}
-	return;
+	return $result;
 	}
 	
 	private function ConnectionTest()
 	{
-	      	$result = false;
 	      	If (Sys_Ping($this->ReadPropertyString("IPAddress"), 100)) {
 			If ($this->GetStatus() <> 102) {
 				$this->SetStatus(102);
@@ -278,6 +279,7 @@ class PhilipsTVRemote extends IPSModule
 			If ($this->GetStatus() <> 202) {
 				$this->SetStatus(202);
 			}
+			$result = false;
 		}
 	return $result;
 	}
