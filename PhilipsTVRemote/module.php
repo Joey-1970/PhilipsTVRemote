@@ -86,7 +86,6 @@ class PhilipsTVRemote extends IPSModule
 			$IP = $this->ReadPropertyString("IPAddress");
 			switch($Ident) {
 				case "State":
-					$this->SetValue($Ident, $Value);
 					If ($Value == false) {
 						// On
 						$MAC = $this->ReadPropertyString("MAC");
@@ -94,13 +93,10 @@ class PhilipsTVRemote extends IPSModule
 						if (filter_var($MAC, FILTER_VALIDATE_MAC)) {
 			 				$this->WakeOnLAN();
 						} 
-						else {
-							//$this->Send_Key("26");
-						}
 					}
 					elseif ($Value == true) {
 						// Off
-						//$this->Send_Key("26");
+						$this->SetState('http://'.$IP.':1925/6/input/key', 'key', 'Standby');
 					}
 					
 					break;	
@@ -205,7 +201,7 @@ class PhilipsTVRemote extends IPSModule
 			else {
 				$Data = json_decode($Result);
 				$this->SetValueWhenChanged("Volume", $Data->{'current'});
-				//$this->SendDebug("GetAudioData", "Fehler beim Daten-Update", 0);
+				$this->SendDebug("GetAudioData", "Muted: ".boolval($Data->{'muted'}), 0);
 				$this->SetValueWhenChanged("Mute", boolval($Data->{'muted'}));
 			}
 		}
@@ -254,29 +250,21 @@ class PhilipsTVRemote extends IPSModule
 	
 	private function ConnectionTest()
 	{
-	      $result = false;
-	      If (Sys_Ping($this->ReadPropertyString("IPAddress"), 100)) {
+	      	$result = false;
+	      	If (Sys_Ping($this->ReadPropertyString("IPAddress"), 100)) {
 			If ($this->GetStatus() <> 102) {
 				$this->SetStatus(102);
 			}
 		      	$result = true;
+		      	$this->SetValueWhenChanged("State", true);
 		}
 		else {
 			IPS_LogMessage("PhilipsTVRemote","IP ".$this->ReadPropertyString("IPAddress")." reagiert nicht!");
 			$this->SendDebug("ConnectionTest", "IP ".$this->ReadPropertyString("IPAddress")." reagiert nicht!", 0);
-			$this->SetValue("State", false);
+			$this->SetValueWhenChanged("State", false);
 			
-			$MAC = $this->ReadPropertyString("MAC");
-		
-			if (filter_var($MAC, FILTER_VALIDATE_MAC)) {
-				If ($this->GetStatus() <> 102) {
-					$this->SetStatus(102);
-				}
-			} 
-			else {
-				If ($this->GetStatus() <> 202) {
-					$this->SetStatus(202);
-				}
+			If ($this->GetStatus() <> 202) {
+				$this->SetStatus(202);
 			}
 		}
 	return $result;
