@@ -67,7 +67,7 @@ class PhilipsTVRemote extends IPSModule
 			}
 			$this->GetSystemData();
 			$this->GetAudioData();
-			$this->SetTimerInterval("PowerState", 30 * 1000);
+			$this->SetTimerInterval("PowerState", 3 * 1000);
 			
 		}
 		else {
@@ -171,8 +171,6 @@ class PhilipsTVRemote extends IPSModule
 		}
 	}
 
-
-	
 	private function GetSystemData()
 	{
 		If ($this->ReadPropertyBoolean("Open") == true) {
