@@ -1,4 +1,4 @@
-<?
+tr<?
 class PhilipsTVRemote extends IPSModule
 {
 	// Überschreibt die interne IPS_Create($id) Funktion
@@ -17,7 +17,7 @@ class PhilipsTVRemote extends IPSModule
 		// Status Variablen anlegen
 		$this->RegisterVariableInteger("LastUpdate", "Letztes Update", "~UnixTimestamp", 10);
 		
-		$this->RegisterVariableBoolean("State", "Status", "~Switch", 10);
+		$this->RegisterVariableBoolean("State", "Power", "~Switch", 10);
 		$this->EnableAction("State");
 
 		$this->RegisterVariableString("Menulanguage", "Menü-Sprache", "", 10);
@@ -86,7 +86,7 @@ class PhilipsTVRemote extends IPSModule
 			$IP = $this->ReadPropertyString("IPAddress");
 			switch($Ident) {
 				case "State":
-					If ($Value == false) {
+					If ($Value == true) {
 						// On
 						$MAC = $this->ReadPropertyString("MAC");
 		
@@ -94,7 +94,7 @@ class PhilipsTVRemote extends IPSModule
 			 				$this->WakeOnLAN();
 						} 
 					}
-					elseif ($Value == true) {
+					elseif ($Value == false) {
 						// Off
 						$this->SetState('http://'.$IP.':1925/6/input/key', 'key', 'Standby');
 					}
