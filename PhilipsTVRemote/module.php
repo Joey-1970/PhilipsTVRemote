@@ -1,4 +1,7 @@
 <?
+
+// Pairing: https://github.com/nstrelow/ha_philips_android_tv
+
 class PhilipsTVRemote extends IPSModule
 {
 	// Überschreibt die interne IPS_Create($id) Funktion
