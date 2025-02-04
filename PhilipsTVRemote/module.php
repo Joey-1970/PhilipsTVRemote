@@ -20,18 +20,19 @@ class PhilipsTVRemote extends IPSModule
 		// Status Variablen anlegen
 		$this->RegisterVariableInteger("LastUpdate", "Letztes Update", "~UnixTimestamp", 10);
 		
-		$this->RegisterVariableBoolean("State", "Power", "~Switch", 10);
+		$this->RegisterVariableBoolean("State", "Power", "~Switch", 20);
 		$this->EnableAction("State");
 
-		$this->RegisterVariableString("Menulanguage", "Menü-Sprache", "", 10);
-		$this->RegisterVariableString("Name", "TV-Typ", "", 10);
-		$this->RegisterVariableString("Country", "Land", "", 10);
-
-		$this->RegisterVariableInteger("Volume", "Volume", "PhilipsTVRemote.Volume", 10);
+		$this->RegisterVariableInteger("Volume", "Volume", "PhilipsTVRemote.Volume", 30);
 		$this->EnableAction("Volume");
-		
-		$this->RegisterVariableBoolean("Mute", "Mute", "~Switch", 10);
+
+		$this->RegisterVariableBoolean("Mute", "Mute", "~Switch", 40);
 		$this->EnableAction("Mute");
+
+		$this->RegisterVariableString("Menulanguage", "Menü-Sprache", "", 100);
+		$this->RegisterVariableString("Name", "TV-Typ", "", 110);
+		$this->RegisterVariableString("Country", "Land", "", 120);
+
 	}
 	
 	public function GetConfigurationForm() { 
