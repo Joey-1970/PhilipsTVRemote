@@ -13,6 +13,12 @@ class PhilipsTVRemote extends IPSModule
 	    	$this->RegisterPropertyString("IPAddress", "127.0.0.1");
 		$this->RegisterPropertyString("MAC", "00:00:00:00:00:00");
 		$this->RegisterTimer("PowerState", 0, 'PhilipsTVRemote_PowerState($_IPS["TARGET"]);');
+
+		$this->RegisterAttributeString("SecretKey", '');
+		$this->RegisterAttributeString("DeviceID", '');
+		$this->RegisterAttributeString("AuthKey", '');
+		$this->RegisterAttributeInteger("AuthTimestamp", 0);
+		$this->RegisterAttributeInteger("TVPin", 0);
 		
 		// Profile anlegen
 		$this->RegisterProfileInteger("PhilipsTVRemote.Volume", "Music", "", "", 0, 60, 1);
@@ -331,6 +337,159 @@ class PhilipsTVRemote extends IPSModule
         		}    
     		}
 	}
+
+	// Pairing-Funktion von Kris
+	private function createRandomString(int $length)
+		{
+			return substr(str_shuffle(str_repeat('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', mt_rand(1,$length))), 1,$length);
+		}
+
+		private function startPairing() 
+		{
+			// start pairing process
+			$Host = $this->ReadPropertyString('IPAddress');
+			
+			if (!$this->ReadAttributeString("DeviceID"))
+			{
+				$this->WriteAttributeString("DeviceID", $this->createRandomString(32));
+				$this->SendDebug(__FUNCTION__, "create DeviceID: ". $this->ReadAttributeString("DeviceID"), 0);
+			}
+
+			$DeviceID = $this->ReadAttributeString('DeviceID');
+
+			$data=[
+					'device' => [
+									'app_id' => 'gapp.id',
+									'id'  => $DeviceID, 
+									'device_name' => 'heliotrope',
+									'device_os' => 'Android',
+									'app_name' => 'ApplicationName',
+									'type' => 'native',
+								],
+					'scope' =>  [ 
+									'read', 
+									'write', 
+									'control'
+								]            
+					];
+
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_URL, 'https://'.$Host.':1926/6/pair/request');
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+			curl_setopt($ch, CURLOPT_HTTPHEADER, [
+				'Content-Type: application/x-www-form-urlencoded',
+			]);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+			curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+			$response = curl_exec($ch);
+			$curl_error = curl_error($ch);
+
+			if (empty($response) || $response === false || !empty($curl_error)) {
+				$this->SendDebug(__FUNCTION__, 'Empty answer from TV: ' . $curl_error, 0);
+				$this->SetStatus(202);
+				return false;
+				}
+			$this->SendDebug(__FUNCTION__, "Start Pairing result: ". $response, 0);
+			curl_close($ch);
+						
+			$result = json_decode($response, true);
+
+			if ($result['error_text'] === "Authorization required")
+			{
+				$this->SendDebug(__FUNCTION__, 'Answer from TV: ' . $result['error_text'], 0);
+				$this->SetStatus(203);
+			}
+
+			$this->WriteAttributeString(__FUNCTION__, "AuthKey", $result['auth_key']);
+			$this->WriteAttributeInteger(__FUNCTION__, "AuthTimestamp", $result['timestamp']);
+			return;
+		}
+
+		private function createAuth()
+		{
+			// create authkey and registering to tv
+			$Host = $this->ReadPropertyString('Host');
+			if (!$this->ReadAttributeString("SecretKey"))
+			{
+				//$this->WriteAttributeString("SecretKey", $this->createRandomString(89));
+				$this->WriteAttributeString("SecretKey", 'ZmVay1EQVFOaZhwQ4Kv81ypLAZNczV9sG4KkseXWn1NEk6cXmPKO/MCa9sryslvLCFMnNe4Z4CPXzToowvhHvA==');
+				$this->SendDebug(__FUNCTION__, "create SecretKey: ". $this->ReadAttributeString("SecretKey"), 0);
+			}
+
+			$auth_timestamp = $this->ReadAttributeInteger('AuthTimestamp');
+			$tvpin = $this->ReadAttributeInteger('TVPin');
+			$AuthKey = $this->ReadAttributeString("AuthKey");
+			$DeviceID = $this->ReadAttributeString('DeviceID');
+
+			//decode Signaturekey
+			$secret_key = base64_decode($this->ReadAttributeString('SecretKey'));
+
+			$authdata = $auth_timestamp.$tvpin;
+			$signature =  base64_encode(hash_hmac('sha1', $secret_key, $authdata, true));
+		
+			$this->SendDebug(__FUNCTION__, "create signature: ". $authdata." ".$signature, 0);
+		
+			$data=[
+					'device' => [
+									'device_name' => 'heliotrope',
+									'device_os' =>  'Android',
+									'app_name' => 'ApplicationName',
+									'type' => 'native',
+									'app_id' => 'app.id',
+									'id' => $DeviceID
+								],
+		
+					'auth' =>   [ 
+									'auth_AppId' => '1',
+									'pin' => $tvpin,
+									'auth_timestamp' => $authdata,
+									'auth_signature' => $signature
+								]
+		
+			];
+			$this->SendDebug(__FUNCTION__, "create Json: ". json_encode($data), 0);
+
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_URL, 'https://'.$Host.':1926/6/pair/grant');
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+			curl_setopt($ch, CURLOPT_HTTPHEADER, [
+				'Content-Type: application/x-www-form-urlencoded',
+			]);
+			curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
+			curl_setopt($ch, CURLOPT_USERPWD, $DeviceID.':'.$AuthKey);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+			curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+
+			$response = curl_exec($ch);
+			$curl_error = curl_error($ch);
+	
+			if (empty($response) || $response === false || !empty($curl_error)) {
+				$this->SendDebug(__FUNCTION__, 'Empty answer from TV: ' . $curl_error, 0);
+				$this->SetStatus(202);
+				return false;
+			}
+
+			$this->SendDebug(__FUNCTION__, "Auth response: ". $response, 0);
+			curl_close($ch);
+			$result = json_decode($response, true);
+
+			if ($result['error_text'] === "Pairing completed")
+			{
+				$this->SendDebug(__FUNCTION__, 'Answer from TV: ' . $result['error_text'], 0);
+				$this->SetStatus(102);
+			}
+
+			return;
+		}
+
 	
 	private function RegisterProfileInteger($Name, $Icon, $Prefix, $Suffix, $MinValue, $MaxValue, $StepSize)
 	{
