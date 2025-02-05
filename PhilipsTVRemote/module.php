@@ -438,7 +438,7 @@ class PhilipsTVRemote extends IPSModule
 		private function createAuth()
 		{
 			// create authkey and registering to tv
-			$Host = $this->ReadPropertyString('Host');
+			$Host = $this->ReadPropertyString('IPAddress');
 			if (!$this->ReadAttributeString("SecretKey"))
 			{
 				//$this->WriteAttributeString("SecretKey", $this->createRandomString(89));
