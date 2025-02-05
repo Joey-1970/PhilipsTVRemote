@@ -39,6 +39,14 @@ class PhilipsTVRemote extends IPSModule
 		$this->RegisterVariableString("Name", "TV-Typ", "", 110);
 		$this->RegisterVariableString("Country", "Land", "", 120);
 
+		$this->RegisterVariableBoolean("startPairing", "Start Pairing", "~Switch", 130);
+		$this->EnableAction("startPairing");
+
+		$this->RegisterVariableBoolean("createAuth", "Create Authg", "~Switch", 140);
+		$this->EnableAction("createAuth");
+
+
+
 	}
 	
 	public function GetConfigurationForm() { 
@@ -123,6 +131,24 @@ class PhilipsTVRemote extends IPSModule
 					IPS_Sleep(200); 
 					$this->GetAudioData();
 					break;
+				case "startPairing":
+					$this->SendDebug(__FUNCTION__, "start getting the auth key: ", 0);
+					$this->startPairing();
+				break;
+				case "createAuth":
+					$this->SendDebug(__FUNCTION__, "Start Pairing Process: ", 0);
+					$this->WriteAttributeInteger('TVPin',$Value);
+					$this->createAuth();
+				break;
+				case "reset":
+					$this->SendDebug(__FUNCTION__, "reset all Variables:", 0);
+					$this->WriteAttributeString("SecretKey", '');
+					$this->WriteAttributeString("DeviceID", '');
+					$this->WriteAttributeString("AuthKey", "");
+					$this->WriteAttributeInteger("AuthTimestamp", 0);
+					$this->ReloadForm();
+					$this->SetStatus(102); 
+				break;
 				default:
 				    throw new Exception("Invalid Ident");
 			}
