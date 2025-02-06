@@ -396,7 +396,7 @@ class PhilipsTVRemote extends IPSModule
 					];
 
 			$ch = curl_init();
-			curl_setopt($ch, CURLOPT_URL, 'https://'.$Host.':1925/6/pair/request');
+			curl_setopt($ch, CURLOPT_URL, 'https://'.$Host.':1926/6/pair/request');
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
 			curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -477,7 +477,7 @@ class PhilipsTVRemote extends IPSModule
 			$this->SendDebug(__FUNCTION__, "create Json: ". json_encode($data), 0);
 
 			$ch = curl_init();
-			curl_setopt($ch, CURLOPT_URL, 'https://'.$Host.':1925/6/pair/grant');
+			curl_setopt($ch, CURLOPT_URL, 'https://'.$Host.':1926/6/pair/grant');
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
 			curl_setopt($ch, CURLOPT_HTTPHEADER, [
