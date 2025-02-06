@@ -365,12 +365,8 @@ class PhilipsTVRemote extends IPSModule
 	}
 
 	// Pairing-Funktion von Kris
-	private function createRandomString(int $length)
-		{
-			return substr(str_shuffle(str_repeat('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', mt_rand(1,$length))), 1,$length);
-		}
 
-		private function startPairing() 
+	private function startPairing() 
 		{
 			// start pairing process
 			$Host = $this->ReadPropertyString('IPAddress');
@@ -424,14 +420,15 @@ class PhilipsTVRemote extends IPSModule
 						
 			$result = json_decode($response, true);
 
+			$this->WriteAttributeString("AuthKey", $result['auth_key']);
+			$this->WriteAttributeInteger("AuthTimestamp", $result['timestamp']);
+			
+
 			if ($result['error_text'] === "Authorization required")
 			{
 				$this->SendDebug(__FUNCTION__, 'Answer from TV: ' . $result['error_text'], 0);
 				$this->SetStatus(203);
 			}
-
-			$this->WriteAttributeString(__FUNCTION__, "AuthKey", $result['auth_key']);
-			$this->WriteAttributeInteger(__FUNCTION__, "AuthTimestamp", $result['timestamp']);
 			return;
 		}
 
@@ -457,7 +454,7 @@ class PhilipsTVRemote extends IPSModule
 			$authdata = $auth_timestamp.$tvpin;
 			$signature =  base64_encode(hash_hmac('sha1', $secret_key, $authdata, true));
 		
-			$this->SendDebug(__FUNCTION__, "create signature: ". $authdata." ".$signature, 0);
+			$this->SendDebug(__FUNCTION__, "create signature: ". $authdata."->".$signature, 0);
 		
 			$data=[
 					'device' => [
