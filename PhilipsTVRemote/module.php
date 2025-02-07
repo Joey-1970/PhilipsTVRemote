@@ -12,7 +12,7 @@ class PhilipsTVRemote extends IPSModule
 		$this->RegisterPropertyBoolean("Open", false);
 	    	$this->RegisterPropertyString("IPAddress", "127.0.0.1");
 		$this->RegisterPropertyString("MAC", "00:00:00:00:00:00");
-		$this->RegisterTimer("PowerState", 0, 'PhilipsTVRemote_PowerState($_IPS["TARGET"]);');
+		$this->RegisterTimer("PowerState", 0, 'PhilipsTVRemote_GetPowerState($_IPS["TARGET"]);');
 
 		$this->RegisterAttributeString("SecretKey", '');
 		$this->RegisterAttributeString("DeviceID", '');
@@ -199,7 +199,7 @@ class PhilipsTVRemote extends IPSModule
 
 			
 			If ($Result === false) {
-				$this->SendDebug("GetState", "Fehler beim Daten-Update", 0);
+				$Result = false;
 				return($Result);
 			}
 			elseif (is_null($Result) == true) {
@@ -285,6 +285,23 @@ class PhilipsTVRemote extends IPSModule
 		}
 	}
 
+	public function GetPowerState()
+	{
+	      	If ($this->ReadPropertyBoolean("Open") == true) {
+			$IP = $this->ReadPropertyString("IPAddress");
+			$URL = 'http://'.$IP.':1925/6/powerstate';
+
+			$Result = $this->GetState($URL);
+			If ($Result === false) {
+				$this->SetValueWhenChanged("State", false);
+			}
+			else {
+				$this->SetValueWhenChanged("State", true);
+			}
+		}
+	return;
+	}
+	
 	private function SetValueWhenChanged($Ident, $Value)
     	{
         	if ($this->GetValue($Ident) != $Value) {
@@ -300,6 +317,7 @@ class PhilipsTVRemote extends IPSModule
 		}
 		else {
 			$this->SetValueWhenChanged("State", false);
+			$this->SetValueWhenChanged("Mute", false);
 			$result = false;
 		}
 	return $result;
