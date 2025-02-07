@@ -190,7 +190,8 @@ class PhilipsTVRemote extends IPSModule
 	
 	public function GetState(String $URL)
 	{
-		If (($this->ReadPropertyBoolean("Open") == true) AND ($this->PowerState() == true)) {
+		//If (($this->ReadPropertyBoolean("Open") == true) AND ($this->PowerState() == true)) {
+		If ($this->ReadPropertyBoolean("Open") == true) {
 			$ch = curl_init();
 			curl_setopt($ch, CURLOPT_URL, $URL);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
