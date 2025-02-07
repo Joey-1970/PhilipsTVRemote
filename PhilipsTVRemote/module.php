@@ -83,10 +83,10 @@ class PhilipsTVRemote extends IPSModule
 			If ($this->GetStatus() <> 102) {
 				$this->SetStatus(102);
 			}
-			
+			$this->SetTimerInterval("PowerState", 2 * 1000);
 			$this->GetSystemData();
 			$this->GetAudioData();
-			$this->SetTimerInterval("PowerState", 2 * 1000);
+			
 			
 		}
 		else {
