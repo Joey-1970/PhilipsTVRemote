@@ -294,6 +294,7 @@ class PhilipsTVRemote extends IPSModule
 			$Result = $this->GetState($URL);
 			If ($Result === false) {
 				$this->SetValueWhenChanged("State", false);
+				$this->SetValueWhenChanged("Mute", false);
 			}
 			else {
 				$this->SetValueWhenChanged("State", true);
@@ -312,12 +313,9 @@ class PhilipsTVRemote extends IPSModule
 	public function PowerState()
 	{
 	      	If (Sys_Ping($this->ReadPropertyString("IPAddress"), 100)) {
-		      	$this->SetValueWhenChanged("State", true);
 			$result = true;
 		}
 		else {
-			$this->SetValueWhenChanged("State", false);
-			$this->SetValueWhenChanged("Mute", false);
 			$result = false;
 		}
 	return $result;
