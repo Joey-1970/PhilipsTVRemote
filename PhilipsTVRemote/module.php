@@ -299,9 +299,9 @@ class PhilipsTVRemote extends IPSModule
 			}
 			else {
 				$this->SetValueWhenChanged("State", true);
+				$this->GetAudioData();
 			}
 		}
-	return;
 	}
 	
 	private function SetValueWhenChanged($Ident, $Value)
