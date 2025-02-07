@@ -197,6 +197,7 @@ class PhilipsTVRemote extends IPSModule
 			$Result = curl_exec($ch);
 			curl_close($ch);
 
+			$this->SendDebug("GetState", "Ergebnis: ".$Result, 0);
 			
 			If ($Result === false) {
 				$Result = false;
@@ -245,7 +246,6 @@ class PhilipsTVRemote extends IPSModule
 			else {
 				$Data = json_decode($Result);
 				$this->SetValueWhenChanged("Volume", $Data->{'current'});
-				$this->SendDebug("GetAudioData", "Muted: ".boolval($Data->{'muted'}), 0);
 				$this->SetValueWhenChanged("Mute", boolval($Data->{'muted'}));
 			}
 		}
